@@ -1,0 +1,52 @@
+language: rust
+rust:
+    - stable
+    - beta
+    - nightly
+sudo: required
+dist: trusty
+os: linux
+cache:
+    directories:
+        - $HOME/.cargo
+        - target
+matrix:
+    fast_finish: true
+    allow_failures:
+        - env:
+              - CARGO_FEATURES=ocf/unstable
+    include:
+        - rust: nightly
+          env:
+              - CARGO_FEATURES=ocf/unstable
+env:
+    matrix:
+        - CARGO_FEATURES=
+        - CARGO_FEATURES=ocf/stable
+    global:
+        - secure: "bja/MwOz/QjbKRf99Rlcp8jPOrv2gyTdUXtKdYqj1yzACspdLprp2qqnj3fk94ytubyARteLhIgqF92Pt57nDstnhfR/DEu7zOLd0pQ4EDNBKc4KK6NUZl3xJdxo+Bwf/LlFR7czI+ejKVBUVaMqWeP7nH3Br8Z7+ojO5C1JTDXP9Cv32yQys2+T2+5fLc8qVN7RGQWSEMeqH/whDXrMATEUosSbxaJY/7QSkgP2vFyh2YSZE0a6tdYM5vVlXPa1wjzuZIey0OeRD9f+F/NUIwjJct+15haCYMOprP+Jd2G4e6Cp7MLB25jx+PNf9Wy4gADItH40lnPhsyGOEtuGBK9V7fEspc47jsGWvJBU24lMPbVtYKMuYyST+NyMfejP/XUUWCzHrOgCpmi635E56VfbRlOaVEPhRAfEjYTWdxUkqujN0jfFNNFMI0CSu6VvFU70Y1R3DW00gSSLSm4MO9iFUy7dXcCrEg/jNjmPvfJNNt3nJDmjTuRPaxBZsJvTrCnfYIOovsZ0+HybR2lUOaMgV33HN9bC29t/cJtJHtdI65HiQJiHtH06bkNBNfw7PLu/4p6y1pMm/W6S/f+wDtgYBcD5EMwC3smYrU7WfBTHvBlCYxSzD7BMTT8fO4Gn0q++8q0RGGvohFurIVPrmFThNvfmdWBde+VTXFTbIS8="
+        - secure: "eAclez26P7weJfnTTRyTPDJ2UwkJXFV758jKSNtMeQZ2Y4n0MffXGsW0nu02UYH3uo9kfzcbh5d14nGwzwFxA+55PqYyqrV5C2dXW2HksqXrZ+l7mEM21rSxY8LuiHroBS6ouEJA6UAlexjdhruQTUpGiUEZRw/bIrYgdl9Zle9jrdzomK1zDtmIxT+5rrOpNSs8Ltu/jk5GBmvSNcawo+xZN/9it3VH1FSBWxxtaaPKi2CGt2TAt03KDJImBEv4J/+0maff78VkDG5pvlTGBz0Lf2B7Igss568LaW6qFzTUBn6A0B3b8dOYpURwzssIthTXH9zrDhvNde3Mhpmu/otwdvOAlQiBZD1C4MecFTkql8SRa3kc1WHR6YpDuKtYEGpeGKk7tzSirgVuhJ4panPxHVAsxwLkQkoKTg9j7eVqcXVpI62qsejSqlTFB5lK5zU10f0wdRgsXrTjwvssuFbQhOvbLTuGufmcn6nErGuwKhvZG5qZ5c0ca9Vg2J96Af772XQzQooHloxicqXqX6Eg5/fIBgBy5picmFeL5zQtIlwI0M1+MO1w3XBuqc8JkO8Ha0A4X4IUBLzj4HMKGA0huLLPmeKkJ1aDpNJCxTQ/O8jbvHe9IMT9Tbk5IVWjnQ0u1kotkOKh4Pry3nIX3TgWqMnnsC0aqCqLUyHlCxI="
+before_script:
+    - curl -L https://github.com/arcnmx/ci/archive/master.tar.gz | tar -xzC $HOME && . $HOME/ci-master/src
+
+script:
+    - cargo test
+    - cargo build
+    - |
+      [[ "$CARGO_FEATURES" = *ocf* ]] && sudo ./oct/test.sh || true
+
+deploy:
+    provider: script
+    script: "true"
+    on:
+        tags: true
+        all_branches: true
+        condition: "$TRAVIS_RUST_VERSION = stable && $CARGO_FEATURES = *ocf/stable*"
+
+before_deploy:
+    - cargo doc
+    - cargo package
+
+after_deploy:
+    - cargo pages-publish
+    - cargo publish
