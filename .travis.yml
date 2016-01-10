@@ -32,7 +32,7 @@ before_script:
 script:
     - cargo test
     - cargo build
-    - |
+    - |-
       [[ "$CARGO_FEATURES" = *ocf* ]] && sudo ./oct/test.sh || true
 
 deploy:
