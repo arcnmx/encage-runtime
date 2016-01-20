@@ -132,7 +132,7 @@ pub fn ocf_config<'s, 'r>(config: &'s ocf::Spec, runtime: &'r ocf::RuntimeSpec) 
                 "ro" => nix::mount::MS_RDONLY,
                 "sync" => nix::mount::MS_SYNCHRONOUS,
                 "nouser" => nix::mount::MS_NOUSER,
-                "x-mount-mkdir" => unimplemented!(),
+                "x-mount.mkdir" => unimplemented!(), // TODO: x-mount.mkdir=[mode]
                 _ => return (None, Some(opt)),
             }), None)).fold((nix::mount::MsFlags::empty(), String::new()), |(flags, mut opts), (flag, opt)| (
                 if let Some(flag) = flag { flags | flag } else { flags },
