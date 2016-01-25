@@ -54,7 +54,7 @@ index e69de29..c3afafa 100644
 +func (this *Encage) StartRT(specDir string) (string, error) {
 +	logrus.Debugf("Launcing runtime")
 +
-+	cmd := exec.Command("encage-run")
++	cmd := exec.Command("encage-run", "runc")
 +	cmd.Dir = specDir
 +	cmd.Stdin = os.Stdin
 +	out, err := cmd.CombinedOutput()
