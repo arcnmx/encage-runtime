@@ -3,6 +3,7 @@ extern crate quick_error;
 #[macro_use]
 extern crate nix;
 extern crate void;
+extern crate libc;
 
 #[cfg(feature = "ocf")]
 mod ocf;
@@ -10,6 +11,7 @@ mod config;
 mod namespace;
 mod root;
 mod mount;
+mod link;
 mod user;
 mod device;
 mod hostname;
@@ -25,9 +27,10 @@ pub use ocf::{OcfError, ocf_config};
 pub use config::{Config, ConfigChain, Configs};
 pub use namespace::{Namespace, NamespaceKind};
 pub use root::Root;
-pub use mount::Mount;
+pub use mount::{Mount, default_mounts};
+pub use link::{Symlink, default_symlinks};
 pub use user::User;
-pub use device::Device;
+pub use device::{Device, default_devices};
 pub use hostname::Hostname;
 pub use command::Command;
 pub use capabilities::Capabilities;

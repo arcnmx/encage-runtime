@@ -44,7 +44,7 @@ impl<'a> Config for Mount<'a> {
         }
 
         // TODO: mkdir properly
-        unsafe { nix::sys::ioctl::libc::mkdir(self.path.as_ptr(), 0755); }
+        unsafe { nix::sys::ioctl::libc::mkdir(self.path.as_ptr(), 0o755); }
 
         let source = self.source.as_ref().map(Borrow::<CStr>::borrow);
         let filesystem = self.filesystem.as_ref().map(Borrow::<CStr>::borrow);
@@ -71,4 +71,42 @@ impl<'a> Config for Mount<'a> {
 
         Ok(())
     }
+}
+
+pub fn default_mounts() -> Vec<Mount<'static>> {
+    vec![
+        Mount::new(
+            cstr!("/proc"), Some(cstr!("proc")), Some(cstr!("proc")),
+            nix::mount::MsFlags::empty(), None::<&CStr>
+        ),
+        Mount::new(
+            cstr!("/dev"), Some(cstr!("tmpfs")), Some(cstr!("tmpfs")),
+            nix::mount::MS_STRICTATIME | nix::mount::MS_NOSUID,
+            Some(cstr!("mode=755,size=65536k"))
+        ),
+        Mount::new(
+            cstr!("/dev/pts"), Some(cstr!("devpts")), Some(cstr!("devpts")),
+            nix::mount::MS_NOEXEC | nix::mount::MS_NOSUID,
+            Some(cstr!("newinstance,ptmxmode=0666,mode=0620,gid=5"))
+        ),
+        Mount::new(
+            cstr!("/dev/mqueue"), Some(cstr!("mqueue")), Some(cstr!("mqueue")),
+            nix::mount::MS_NOEXEC | nix::mount::MS_NOSUID | nix::mount::MS_NODEV,
+            None::<&CStr>
+        ),
+        Mount::new(
+            cstr!("/dev/shm"), Some(cstr!("shm")), Some(cstr!("tmpfs")),
+            nix::mount::MS_NOEXEC | nix::mount::MS_NOSUID | nix::mount::MS_NODEV,
+            Some(cstr!("mode=1777,size=65536k"))
+        ),
+        Mount::new(
+            cstr!("/sys"), Some(cstr!("sysfs")), Some(cstr!("sysfs")),
+            nix::mount::MS_NOEXEC | nix::mount::MS_NOSUID | nix::mount::MS_NODEV,
+            None::<&CStr>
+        ),
+        Mount::new(
+            cstr!("/tmp"), Some(cstr!("tmpfs")), Some(cstr!("tmpfs")),
+            nix::mount::MsFlags::empty(), None::<&CStr>
+        ),
+    ]
 }

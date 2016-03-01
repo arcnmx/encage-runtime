@@ -4,6 +4,7 @@ use into_cow::IntoCow;
 use config::Config;
 use nix;
 
+#[derive(Clone, Debug)]
 pub struct Root<'a> {
     chroot: Cow<'a, CStr>,
     cwd: Cow<'a, CStr>,

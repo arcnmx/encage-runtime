@@ -4,6 +4,7 @@ use into_cow::IntoCow;
 use config::Config;
 use nix;
 
+#[derive(Clone, Debug)]
 pub struct Device<'a> {
     path: Cow<'a, CStr>,
     kind: nix::sys::stat::SFlag,
@@ -35,3 +36,16 @@ impl<'a> Config for Device<'a> {
     }
 }
 
+pub fn default_devices() -> Vec<Device<'static>> {
+    let world = nix::sys::stat::Mode::from_bits_truncate(0o666);
+    let chr = nix::sys::stat::S_IFCHR;
+
+    vec![
+        Device::new(cstr!("/dev/null"), chr, world, (1, 3)),
+        Device::new(cstr!("/dev/zero"), chr, world, (1, 5)),
+        Device::new(cstr!("/dev/full"), chr, world, (1, 7)),
+        Device::new(cstr!("/dev/random"), chr, world, (1, 8)),
+        Device::new(cstr!("/dev/urandom"), chr, world, (1, 9)),
+        Device::new(cstr!("/dev/tty"), chr, world, (5, 0)),
+    ]
+}

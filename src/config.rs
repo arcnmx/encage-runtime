@@ -12,6 +12,7 @@ pub trait Config {
     }
 }
 
+#[derive(Clone, Debug)]
 pub struct ConfigChain<A, B>(A, B);
 
 impl<A: Config, B: Config> Config for ConfigChain<A, B> {
@@ -57,6 +58,7 @@ impl<C: Config> Config for Option<C> {
     }
 }
 
+#[derive(Clone, Debug)]
 pub struct Configs<C>(Box<[C]>);
 
 impl<C> Configs<C> {

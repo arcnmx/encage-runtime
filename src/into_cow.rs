@@ -29,6 +29,12 @@ impl<'a> IntoCow<'a, CStr> for CString {
     }
 }
 
+impl<'a> IntoCow<'a, CStr> for &'a CString {
+    fn into_cow(self) -> Cow<'a, CStr> {
+        Cow::Borrowed(self)
+    }
+}
+
 impl<'a> IntoCow<'a, CStr> for &'a CStr {
     fn into_cow(self) -> Cow<'a, CStr> {
         Cow::Borrowed(self)
